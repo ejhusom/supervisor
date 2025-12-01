@@ -1,0 +1,7 @@
+# iExplain v2 Dependencies
+
+# LLM client
+litellm>=1.0.0
+
+# Standard library only - no other dependencies needed!
+# The system is designed to be minimal and self-contained.

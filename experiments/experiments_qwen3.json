@@ -1,0 +1,34 @@
+[
+  {
+    "name": "baseline_qwen3_8b_no_preprocessing",
+    "provider": "ollama",
+    "model": "qwen3:8b",
+    "workflow": "simple",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_qwen3_8b_with_preprocessing",
+    "provider": "ollama",
+    "model": "qwen3:8b",
+    "workflow": "simple",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_qwen3_8b_no_preprocessing",
+    "provider": "ollama",
+    "model": "qwen3:8b",
+    "workflow": "evaluator",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_qwen3_8b_with_preprocessing",
+    "provider": "ollama",
+    "model": "qwen3:8b",
+    "workflow": "evaluator",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  }
+]

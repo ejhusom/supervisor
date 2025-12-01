@@ -1,0 +1,13 @@
+*.DS_Store
+*.swp
+venv
+.venv
+**/__pycache__/
+*.pyc
+*.log
+ignore*
+workspace*
+logs
+results
+results_*
+evaluation

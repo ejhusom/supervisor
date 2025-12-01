@@ -1,0 +1,43 @@
+[
+  {
+    "name": "sonnet4.5-simple-no-preprocess",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-20250514",
+    "workflow": "simple",
+    "preprocessing": false
+  },
+  {
+    "name": "sonnet4.5-simple-with-preprocess",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-20250514",
+    "workflow": "simple",
+    "preprocessing": true
+  },
+  {
+    "name": "sonnet4.5-evaluator-with-preprocess",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-20250514",
+    "workflow": "evaluator",
+    "max_iterations": 3,
+    "preprocessing": true
+  },
+  {
+    "name": "sonnet4.5-multistage-with-preprocess",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-20250514",
+    "workflow": "multi_stage",
+    "stages": [
+      "Extract relevant statistics from the log file",
+      "Analyze the data to answer the question",
+      "Provide the final answer"
+    ],
+    "preprocessing": true
+  },
+  {
+    "name": "gpt4o-mini-simple-with-preprocess",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "workflow": "simple",
+    "preprocessing": true
+  }
+]

@@ -1,0 +1,34 @@
+# provider = "anthropic"
+# model = "claude-3-5-haiku-20241022"
+# model = "claude-sonnet-4-20250514"
+provider = "openai"
+model = "gpt-4o-mini"
+# model = "gpt-5"
+# model = "gpt-5-nano"
+# provider = "ollama"
+# model = "qwen3:8b"
+# model = "gpt-oss:120b-cloud"
+# model = "gpt-oss"
+# model = "llama3.2"
+# model = "kimi-k2:1t-cloud"
+# model = "glm-4.6:cloud"
+temperature = 0.0
+max_tokens = 8192
+workspace = "./workspace"
+sandbox_timeout = 60
+sandbox_allow_write = true
+tool_call_output_max_length = 1000
+truncate_tool_calls = true
+embeddings_chunk_size = 100
+
+# Logging settings
+log_full_messages = true  # Include complete message history in logs (increases log size)
+
+# Printer settings for terminal output
+print_verbosity = "normal"  # quiet, normal, verbose
+print_use_colors = true
+print_truncate_length = 400  # Max characters for truncated output
+
+# If tools list is empty, all tools will be available
+tools_available = []
+tools_unavailable = ["execute_python"]

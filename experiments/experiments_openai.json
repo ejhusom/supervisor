@@ -1,0 +1,194 @@
+[
+  {
+    "name": "baseline_gpt4o_mini_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "workflow": "simple",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_gpt4o_mini_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "workflow": "simple",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt4o_mini_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "workflow": "evaluator",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt4o_mini_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "workflow": "evaluator",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_gpt5_nano_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-5-nano",
+    "workflow": "simple",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_gpt5_nano_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-5-nano",
+    "workflow": "simple",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt5_nano_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-5-nano",
+    "workflow": "evaluator",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt5_nano_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-5-nano",
+    "workflow": "evaluator",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_gpt4_1_nano_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4.1-nano",
+    "workflow": "simple",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_gpt4_1_nano_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4.1-nano",
+    "workflow": "simple",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt4_1_nano_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4.1-nano",
+    "workflow": "evaluator",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt4_1_nano_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4.1-nano",
+    "workflow": "evaluator",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_gpt5_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-5",
+    "workflow": "simple",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_gpt5_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-5",
+    "workflow": "simple",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt5_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-5",
+    "workflow": "evaluator",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt5_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-5",
+    "workflow": "evaluator",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "basline_gpt-4.1_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4.1",
+    "workflow": "simple",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_gpt-4.1_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4.1",
+    "workflow": "simple",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt-4.1_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4.1",
+    "workflow": "evaluator",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt-4.1_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4.1",
+    "workflow": "evaluator",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_gpt-4o_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "workflow": "simple",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "baseline_gpt-4o_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "workflow": "simple",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt-4o_no_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "workflow": "evaluator",
+    "use_preprocessing": false,
+    "use_embeddings": false
+  },
+  {
+    "name": "evaluator_gpt-4o_with_preprocessing",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "workflow": "evaluator",
+    "use_preprocessing": true,
+    "use_embeddings": false
+  }
+]

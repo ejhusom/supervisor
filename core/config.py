@@ -14,6 +14,9 @@ class Config:
         self.config["model"] = self.config.get("model", "claude-sonnet-4-20250514")
         self.config["temperature"] = self.config.get("temperature", 0.0)
         self.config["max_tokens"] = self.config.get("max_tokens", 8192)
+
+        # Agent loop settings
+        self.config["max_iterations"] = self.config.get("max_iterations", 50)
         
         # Sandbox settings
         self.config["sandbox_timeout"] = self.config.get("sandbox_timeout", 100)

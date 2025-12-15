@@ -20,6 +20,7 @@ sandbox_allow_write = true
 tool_call_output_max_length = 1000
 truncate_tool_calls = true
 embeddings_chunk_size = 100
+max_iterations = 100
 
 # Logging settings
 log_full_messages = true  # Include complete message history in logs (increases log size)

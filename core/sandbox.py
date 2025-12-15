@@ -18,7 +18,7 @@ class Sandbox:
     # Allowed Unix commands (whitelist for security)
     ALLOWED_COMMANDS = {
         # File viewing
-        'cat', 'head', 'tail', 'less', 'more',
+        'cat', 'echo', 'head', 'tail', 'less', 'more',
         # File operations
         'ls', 'find', 'wc', 'stat', 'file',
         # Text processing

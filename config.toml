@@ -2,8 +2,8 @@
 # model = "claude-3-5-haiku-20241022"
 # model = "claude-sonnet-4-20250514"
 provider = "openai"
-# model = "gpt-4o-mini"
-model = "gpt-5"
+model = "gpt-4o-mini"
+# model = "gpt-5"
 # model = "gpt-5-nano"
 # provider = "ollama"
 # model = "qwen3:8b"
@@ -33,3 +33,9 @@ print_truncate_length = 400  # Max characters for truncated output
 # If tools list is empty, all tools will be available
 tools_available = []
 tools_unavailable = ["execute_python"]
+
+# Standard agents configuration
+# If agents_available is empty, all standard agents will be registered
+# Use agents_unavailable to exclude specific standard agents
+agents_available = []  # e.g., ["file_manager", "shell_worker"]
+agents_unavailable = []  # e.g., ["log_analyst"]

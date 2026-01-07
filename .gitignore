@@ -11,4 +11,5 @@ logs
 results
 results_*
 evaluation
+key.txt
 agent-green

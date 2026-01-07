@@ -10,6 +10,7 @@ from .llm_client import LLMClient
 from .logger import get_logger
 from .sandbox import Sandbox
 from .standard_tools import get_standard_tools
+from .standard_agents import register_standard_agents
 from .preprocessor import Preprocessor
 from registry.tool_registry import ToolRegistry
 from registry.agent_registry import AgentRegistry
@@ -52,6 +53,9 @@ class Supervisor:
             preprocessing_tools = preprocessor.get_all_tools()
             self.standard_tools.update(preprocessing_tools)
             print(f"Added {len(preprocessing_tools)} preprocessing tools to supervisor")
+        
+        # Register standard agents with filtered tools
+        self._register_standard_agents()
         
         # Create supervisor agent with all tools
         all_tools = {**self._get_meta_tools(), **self.standard_tools}
@@ -106,6 +110,44 @@ class Supervisor:
         print(f"\nSession log saved to: {log_file}")
 
         return result
+    
+    def _register_standard_agents(self) -> None:
+        """Register standard agents based on configuration."""
+        from .standard_agents import STANDARD_AGENT_SPECS
+        
+        # Get config filters
+        agents_available = config.get("agents_available", [])
+        agents_unavailable = config.get("agents_unavailable", [])
+        
+        # Filter specs based on configuration
+        filtered_specs = []
+        for spec in STANDARD_AGENT_SPECS:
+            agent_name = spec["name"]
+            
+            # Apply availability filters
+            if agents_available and agent_name not in agents_available:
+                continue
+            if agents_unavailable and agent_name in agents_unavailable:
+                continue
+                
+            filtered_specs.append(spec)
+        
+        # Temporarily override STANDARD_AGENT_SPECS for registration
+        import core.standard_agents as sa_module
+        original_specs = sa_module.STANDARD_AGENT_SPECS
+        sa_module.STANDARD_AGENT_SPECS = filtered_specs
+        
+        try:
+            registered = register_standard_agents(
+                self.agent_registry,
+                self.llm_client,
+                self.standard_tools
+            )
+            if registered:
+                print(f"Registered {len(registered)} standard agent(s): {', '.join(registered)}")
+        finally:
+            # Restore original specs
+            sa_module.STANDARD_AGENT_SPECS = original_specs
     
     def _load_system_prompt(self) -> str:
         """Load supervisor system prompt from instructions."""

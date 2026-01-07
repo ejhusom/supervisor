@@ -32,22 +32,6 @@ from .agent import Agent
 # Extend this list to add more agents or adjust prompts/tool sets.
 STANDARD_AGENT_SPECS: List[Dict[str, Any]] = [
 	{
-		"name": "file_manager",
-		"system_prompt": (
-			"You are a precise file manager. You read and write files inside the "
-			"workspace, list directories, and never access paths outside the sandbox."
-		),
-		"tools": ["read_file", "write_file", "list_files"],
-	},
-	{
-		"name": "shell_worker",
-		"system_prompt": (
-			"You run safe, whitelisted Unix commands and shell pipelines to inspect "
-			"and transform data within the sandbox."
-		),
-		"tools": ["run_command", "run_shell"],
-	},
-	{
 		# Will only be created if preprocessing tools exist
 		"name": "log_analyst",
 		"system_prompt": (

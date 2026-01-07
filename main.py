@@ -102,9 +102,9 @@ Examples:
         '--workflow', '-w',
         type=str,
         default='simple',
-        choices=['simple', 'evaluator', 'multi_stage', 'analysis', 'research', 'transformation'],
+        choices=['simple', 'evaluator', 'multi_stage', 'analysis', 'research', 'transformation', 'log_explanation'],
         help='Workflow type: simple (default), evaluator (retry with evaluation), '
-             'multi_stage (custom stages), or predefined: analysis, research, transformation'
+             'multi_stage (custom stages), or predefined: analysis, research, transformation, log_explanation'
     )
     
     parser.add_argument(
@@ -208,15 +208,19 @@ Examples:
     
     elif workflow_type == 'analysis':
         workflow = PredefinedMultiStageWorkflow.analysis_workflow(supervisor)
-        ui.workflow_info("analysis", "Analysis workflow initialized (parse → analyze → summarize)")
+        ui.workflow_info("analysis", "Analysis workflow initialized (parse -> analyze -> summarize)")
     
     elif workflow_type == 'research':
         workflow = PredefinedMultiStageWorkflow.research_workflow(supervisor)
-        ui.workflow_info("research", "Research workflow initialized (gather → synthesize → conclude)")
+        ui.workflow_info("research", "Research workflow initialized (gather -> synthesize -> conclude)")
     
     elif workflow_type == 'transformation':
         workflow = PredefinedMultiStageWorkflow.transformation_workflow(supervisor)
-        ui.workflow_info("transformation", "Transformation workflow initialized (extract → transform → format)")
+        ui.workflow_info("transformation", "Transformation workflow initialized (extract -> transform -> format)")
+
+    elif workflow_type == 'log_explanation':
+        workflow = PredefinedMultiStageWorkflow.transformation_workflow(supervisor)
+        ui.workflow_info("log_explanation", "Log explanation workflow initialized (parse -> detect -> explain)")
     
     else:
         # Fallback to simple

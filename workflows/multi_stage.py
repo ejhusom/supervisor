@@ -185,7 +185,7 @@ class PredefinedMultiStageWorkflow(MultiStageWorkflow):
     @classmethod
     def analysis_workflow(cls, supervisor) -> 'PredefinedMultiStageWorkflow':
         """
-        Create a workflow for: parse → analyze → summarize.
+        Create a workflow for: parse -> analyze -> summarize.
         
         Good for log analysis, data investigation, etc.
         """
@@ -199,7 +199,7 @@ class PredefinedMultiStageWorkflow(MultiStageWorkflow):
     @classmethod
     def research_workflow(cls, supervisor) -> 'PredefinedMultiStageWorkflow':
         """
-        Create a workflow for: gather → synthesize → conclude.
+        Create a workflow for: gather -> synthesize -> conclude.
         
         Good for research tasks, information synthesis, etc.
         """
@@ -213,7 +213,7 @@ class PredefinedMultiStageWorkflow(MultiStageWorkflow):
     @classmethod
     def transformation_workflow(cls, supervisor) -> 'PredefinedMultiStageWorkflow':
         """
-        Create a workflow for: extract → transform → format.
+        Create a workflow for: extract -> transform -> format.
         
         Good for data processing, format conversion, etc.
         """
@@ -221,5 +221,19 @@ class PredefinedMultiStageWorkflow(MultiStageWorkflow):
             "Extract the necessary data from the input",
             "Transform and process the data as needed",
             "Format the output in the desired structure"
+        ]
+        return cls(supervisor, stages=stages)
+
+    @classmethod
+    def log_explanation_workflow(cls, supervisor) -> 'PredefinedMultiStageWorkflow':
+        """
+        Create a workflow for: parse - anomaly detection - explain
+        
+        Good for data processing, format conversion, etc.
+        """
+        stages = [
+                "Extract meaningful events/core messages from raw logs",
+                "Determine whether block behavior violates normal operational patterns",
+                "Explain why this block was classified as anomalous"
         ]
         return cls(supervisor, stages=stages)

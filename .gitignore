@@ -12,5 +12,6 @@ results
 results_*
 evaluation
 key.txt
+.github
 agent-green
 iExplain-logAnalysis

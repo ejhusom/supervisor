@@ -39,3 +39,9 @@ tools_unavailable = ["execute_python"]
 # Use agents_unavailable to exclude specific standard agents
 agents_available = []  # e.g., ["file_manager", "shell_worker"]
 agents_unavailable = []  # e.g., ["log_analyst"]
+
+# Prompt variants for log analysis agents
+[prompts]
+log_preprocessor = "few_shot"
+log_anomaly_detector = "hdfs_few_shot"
+log_explainer = "few_shot"

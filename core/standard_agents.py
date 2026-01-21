@@ -23,9 +23,12 @@ Notes:
 - Preprocessing-dependent agents should gracefully skip if tools are missing.
 """
 
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+import tomllib
+from pathlib import Path
 
 from .agent import Agent
+from .prompt_registry import get_prompt, PROMPT_REGISTRY
 
 
 # Minimal, discoverable definitions for standard agents.
@@ -279,6 +282,25 @@ def _resolve_tools_for_spec(
 	return resolved
 
 
+def _load_prompt_config() -> Dict[str, str]:
+	"""Load prompt variant configuration from config.toml."""
+	config_path = Path(__file__).parent.parent / "config.toml"
+	if not config_path.exists():
+		return {}
+	with open(config_path, "rb") as f:
+		config = tomllib.load(f)
+	return config.get("prompts", {})
+
+
+def _get_system_prompt(spec: Dict[str, Any], prompt_config: Dict[str, str]) -> str:
+	"""Get system prompt for an agent, using registry if available."""
+	agent_name = spec["name"]
+	if agent_name in PROMPT_REGISTRY:
+		variant = prompt_config.get(agent_name, "default")
+		return get_prompt(agent_name, variant)
+	return spec.get("system_prompt", "")
+
+
 def build_standard_agents(
 	llm_client: Any, available_tools: Dict[str, Dict[str, Any]]
 ) -> Dict[str, Agent]:
@@ -288,6 +310,7 @@ def build_standard_agents(
 	are skipped.
 	"""
 	agents: Dict[str, Agent] = {}
+	prompt_config = _load_prompt_config()
 
 	for spec in STANDARD_AGENT_SPECS:
 		tools_for_agent = _resolve_tools_for_spec(spec, available_tools)
@@ -295,9 +318,10 @@ def build_standard_agents(
 			# Skip agents with no usable tools in current runtime
 			continue
 
+		system_prompt = _get_system_prompt(spec, prompt_config)
 		agent = Agent(
 			name=spec["name"],
-			system_prompt=spec["system_prompt"],
+			system_prompt=system_prompt,
 			llm_client=llm_client,
 			tools=tools_for_agent,
 		)
@@ -306,10 +330,10 @@ def build_standard_agents(
 	return agents
 
 
-def _persist_config_for_agent(spec: Dict[str, Any], tools_for_agent: Dict[str, Any]) -> Dict[str, Any]:
+def _persist_config_for_agent(spec: Dict[str, Any], tools_for_agent: Dict[str, Any], system_prompt: str) -> Dict[str, Any]:
 	"""Create a minimal persistence config for AgentRegistry."""
 	return {
-		"system_prompt": spec.get("system_prompt", ""),
+		"system_prompt": system_prompt,
 		"tools": list(tools_for_agent.keys()),
 	}
 
@@ -324,19 +348,22 @@ def register_standard_agents(
 	Returns a list of agent names that were successfully registered and persisted.
 	"""
 	registered: List[str] = []
+	prompt_config = _load_prompt_config()
+
 	for spec in STANDARD_AGENT_SPECS:
 		tools_for_agent = _resolve_tools_for_spec(spec, available_tools)
 		if not tools_for_agent:
 			continue
 
+		system_prompt = _get_system_prompt(spec, prompt_config)
 		agent = Agent(
 			name=spec["name"],
-			system_prompt=spec["system_prompt"],
+			system_prompt=system_prompt,
 			llm_client=llm_client,
 			tools=tools_for_agent,
 		)
 
-		config = _persist_config_for_agent(spec, tools_for_agent)
+		config = _persist_config_for_agent(spec, tools_for_agent, system_prompt)
 		agent_registry.register(spec["name"], agent, config)
 		registered.append(spec["name"])
 

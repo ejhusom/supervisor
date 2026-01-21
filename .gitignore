@@ -13,5 +13,7 @@ results_*
 evaluation
 key.txt
 .github
+AGENTS.md
+PROJECT.md
 agent-green
 iExplain-logAnalysis

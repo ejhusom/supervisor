@@ -219,7 +219,7 @@ Examples:
         ui.workflow_info("transformation", "Transformation workflow initialized (extract -> transform -> format)")
 
     elif workflow_type == 'log_explanation':
-        workflow = PredefinedMultiStageWorkflow.transformation_workflow(supervisor)
+        workflow = PredefinedMultiStageWorkflow.log_explanation_workflow(supervisor)
         ui.workflow_info("log_explanation", "Log explanation workflow initialized (parse -> detect -> explain)")
     
     else:

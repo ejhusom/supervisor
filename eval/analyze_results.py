@@ -3,9 +3,10 @@
 Analyze evaluation results and generate comparison report.
 
 Usage:
-    python eval/analyze_results.py [--results-dir DIR] [--output FORMAT]
+    uv run python3 eval/analyze_results.py [--results-dir DIR] [--output FILE]
 """
 import argparse
+import csv
 import json
 from pathlib import Path
 from datetime import datetime
@@ -33,45 +34,64 @@ def generate_comparison_table(results: list) -> str:
         "",
         f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
         "",
-        "## Summary by Prompt Variant",
+        "## Summary by Configuration",
         "",
-        "| Variant | Model | Accuracy | Correct | Incorrect | Unparseable | Timestamp |",
-        "|---------|-------|----------|---------|-----------|-------------|-----------|"
+        "| Variant | Model | Accuracy | Precision | Recall | F1 | TP | FP | TN | FN |",
+        "|---------|-------|----------|-----------|--------|----|----|----|----|-----|"
     ]
     
     for r in results:
         meta = r["metadata"]
-        summ = r["summary"]
-        accuracy_pct = f"{summ.get('accuracy', 0):.1%}"
+        # Support both old "summary" and new "metrics" format
+        m = r.get("metrics", r.get("summary", {}))
+        
+        accuracy = m.get("accuracy", 0)
+        precision = m.get("precision", 0)
+        recall = m.get("recall", 0)
+        f1 = m.get("f1", 0)
+        
         lines.append(
-            f"| {meta['prompt_variant']} | {meta['model']} | {accuracy_pct} | "
-            f"{summ['correct']} | {summ['incorrect']} | {summ['unparseable']} | "
-            f"{meta['timestamp']} |"
+            f"| {meta['prompt_variant']} | {meta['model']} | "
+            f"{accuracy:.2%} | {precision:.2%} | {recall:.2%} | {f1:.2%} | "
+            f"{m.get('TP', '-')} | {m.get('FP', '-')} | {m.get('TN', '-')} | {m.get('FN', '-')} |"
         )
     
-    lines.extend([
+    return "\n".join(lines)
+
+
+def generate_per_test_breakdown(results: list) -> str:
+    """Generate per-test comparison table."""
+    if not results:
+        return ""
+    
+    lines = [
         "",
         "## Per-Test Breakdown",
         ""
-    ])
+    ]
     
-    # Collect all test IDs
-    all_test_ids = set()
+    # Collect all block IDs
+    all_block_ids = set()
     for r in results:
-        for tr in r["test_results"]:
-            all_test_ids.add(tr["test_id"])
+        for tr in r.get("test_results", []):
+            all_block_ids.add(tr.get("block_id", tr.get("blk_id", "unknown")))
     
-    # Create per-test comparison
-    lines.append("| Test ID | Expected | " + " | ".join(r["metadata"]["prompt_variant"] for r in results) + " |")
-    lines.append("|---------|----------|" + "|".join(["----------"] * len(results)) + "|")
+    if not all_block_ids:
+        return ""
     
-    for test_id in sorted(all_test_ids):
-        row = [test_id]
+    # Create header
+    header = "| Block ID | Expected | " + " | ".join(r["metadata"]["prompt_variant"] for r in results) + " |"
+    separator = "|----------|----------|" + "|".join(["----------"] * len(results)) + "|"
+    lines.extend([header, separator])
+    
+    for block_id in sorted(all_block_ids):
+        row = [block_id[:20]]  # Truncate long block IDs
         expected = None
         
         for r in results:
-            for tr in r["test_results"]:
-                if tr["test_id"] == test_id:
+            for tr in r.get("test_results", []):
+                tr_id = tr.get("block_id", tr.get("blk_id"))
+                if tr_id == block_id:
                     if expected is None:
                         expected = tr["expected_label"]
                     predicted = tr["predicted_label"]
@@ -81,7 +101,7 @@ def generate_comparison_table(results: list) -> str:
             else:
                 row.append("-")
         
-        row.insert(1, str(expected))
+        row.insert(1, str(expected) if expected is not None else "-")
         lines.append("| " + " | ".join(row) + " |")
     
     return "\n".join(lines)
@@ -91,12 +111,16 @@ def generate_best_config_summary(results: list) -> str:
     """Identify and document the best performing configuration."""
     
     if not results:
-        return "No results to analyze."
+        return "\nNo results to analyze."
     
-    # Find best by accuracy
-    best = max(results, key=lambda r: r["summary"].get("accuracy", 0))
+    # Find best by F1 (more robust than accuracy for imbalanced data)
+    def get_f1(r):
+        m = r.get("metrics", r.get("summary", {}))
+        return m.get("f1", m.get("accuracy", 0))
+    
+    best = max(results, key=get_f1)
     meta = best["metadata"]
-    summ = best["summary"]
+    m = best.get("metrics", best.get("summary", {}))
     
     lines = [
         "",
@@ -104,14 +128,15 @@ def generate_best_config_summary(results: list) -> str:
         "",
         f"**Prompt Variant:** {meta['prompt_variant']}",
         f"**Model:** {meta['model']} ({meta['provider']})",
-        f"**Accuracy:** {summ.get('accuracy', 0):.1%} ({summ['correct']}/{summ['total'] - summ['unparseable']})",
+        f"**F1 Score:** {m.get('f1', 0):.2%}",
+        f"**Accuracy:** {m.get('accuracy', 0):.2%}",
         "",
         "### Recommended Settings",
         "",
         "```toml",
         f'provider = "{meta["provider"]}"',
         f'model = "{meta["model"]}"',
-        f'temperature = {meta["temperature"]}',
+        f'temperature = {meta.get("temperature", 0.0)}',
         "",
         "[prompts]",
         f'log_preprocessor = "{meta["prompt_variant"]}"',
@@ -138,6 +163,7 @@ def main():
     print(f"Found {len(results)} evaluation result(s)")
     
     report = generate_comparison_table(results)
+    report += generate_per_test_breakdown(results)
     report += generate_best_config_summary(results)
     
     with open(args.output, "w") as f:

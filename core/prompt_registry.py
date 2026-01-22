@@ -4,7 +4,7 @@ Prompt registry for swappable system prompts.
 from typing import Dict, Optional
 
 # Import prompts from examples
-from examples.system_prompts import (
+from core.system_prompts import (
     SYS_MSG_LOG_PREPROCESSOR_FEW_SHOT,
     SYS_MSG_LOG_PREPROCESSOR_ZERO_SHOT,
     SYS_MSG_LOG_ANOMALY_DETECTOR_HDFS_FEW_SHOT,

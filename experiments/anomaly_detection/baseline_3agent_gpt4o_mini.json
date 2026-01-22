@@ -1,0 +1,28 @@
+[
+  {
+    "name": "baseline_3agent_gpt4o_mini_few_shot",
+    "description": "Hardcoded 3-agent pipeline with few-shot prompts",
+    "task": "anomaly_detection",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "pipeline": "hardcoded_3agent",
+    "prompts": {
+      "parser": "few_shot",
+      "detector": "hdfs_few_shot",
+      "explainer": "few_shot"
+    }
+  },
+  {
+    "name": "baseline_3agent_gpt4o_mini_zero_shot",
+    "description": "Hardcoded 3-agent pipeline with zero-shot prompts",
+    "task": "anomaly_detection",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "pipeline": "hardcoded_3agent",
+    "prompts": {
+      "parser": "zero_shot",
+      "detector": "hdfs_zero_shot",
+      "explainer": "zero_shot"
+    }
+  }
+]

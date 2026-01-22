@@ -1,0 +1,54 @@
+[
+  {
+    "name": "baseline_3agent_gpt4o_mini_few_shot",
+    "description": "Hardcoded 3-agent pipeline with few-shot prompts",
+    "task": "anomaly_detection",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "pipeline": "hardcoded_3agent",
+    "prompts": {
+      "parser": "few_shot",
+      "detector": "hdfs_few_shot",
+      "explainer": "few_shot"
+    }
+  },
+  {
+    "name": "baseline_3agent_gpt4o_mini_zero_shot",
+    "description": "Hardcoded 3-agent pipeline with zero-shot prompts",
+    "task": "anomaly_detection",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "pipeline": "hardcoded_3agent",
+    "prompts": {
+      "parser": "zero_shot",
+      "detector": "hdfs_zero_shot",
+      "explainer": "zero_shot"
+    }
+  },
+  {
+    "name": "baseline_3agent_gpt4o_few_shot",
+    "description": "Hardcoded 3-agent pipeline with GPT-4o",
+    "task": "anomaly_detection",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "pipeline": "hardcoded_3agent",
+    "prompts": {
+      "parser": "few_shot",
+      "detector": "hdfs_few_shot",
+      "explainer": "few_shot"
+    }
+  },
+  {
+    "name": "baseline_3agent_claude_sonnet_few_shot",
+    "description": "Hardcoded 3-agent pipeline with Claude Sonnet",
+    "task": "anomaly_detection",
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-20250514",
+    "pipeline": "hardcoded_3agent",
+    "prompts": {
+      "parser": "few_shot",
+      "detector": "hdfs_few_shot",
+      "explainer": "few_shot"
+    }
+  }
+]

@@ -50,8 +50,12 @@ def generate_comparison_table(results: list) -> str:
         recall = m.get("recall", 0)
         f1 = m.get("f1", 0)
         
+        # Get experiment name (new format) or prompt_variant (legacy)
+        exp_name = meta.get("experiment", meta.get("prompt_variant", "unknown"))
+        model = meta.get("model", "unknown")
+        
         lines.append(
-            f"| {meta['prompt_variant']} | {meta['model']} | "
+            f"| {exp_name} | {model} | "
             f"{accuracy:.2%} | {precision:.2%} | {recall:.2%} | {f1:.2%} | "
             f"{m.get('TP', '-')} | {m.get('FP', '-')} | {m.get('TN', '-')} | {m.get('FN', '-')} |"
         )
@@ -79,8 +83,13 @@ def generate_per_test_breakdown(results: list) -> str:
     if not all_block_ids:
         return ""
     
+    # Get experiment names for header
+    def get_exp_name(r):
+        meta = r["metadata"]
+        return meta.get("experiment", meta.get("prompt_variant", "unknown"))
+    
     # Create header
-    header = "| Block ID | Expected | " + " | ".join(r["metadata"]["prompt_variant"] for r in results) + " |"
+    header = "| Block ID | Expected | " + " | ".join(get_exp_name(r) for r in results) + " |"
     separator = "|----------|----------|" + "|".join(["----------"] * len(results)) + "|"
     lines.extend([header, separator])
     
@@ -122,28 +131,41 @@ def generate_best_config_summary(results: list) -> str:
     meta = best["metadata"]
     m = best.get("metrics", best.get("summary", {}))
     
+    # Get experiment name
+    exp_name = meta.get("experiment", meta.get("prompt_variant", "unknown"))
+    provider = meta.get("provider", "unknown")
+    model = meta.get("model", "unknown")
+    
+    # Get prompts info if available
+    prompts = meta.get("prompts", {})
+    
     lines = [
         "",
         "## Best Performing Configuration",
         "",
-        f"**Prompt Variant:** {meta['prompt_variant']}",
-        f"**Model:** {meta['model']} ({meta['provider']})",
+        f"**Experiment:** {exp_name}",
+        f"**Model:** {model} ({provider})",
         f"**F1 Score:** {m.get('f1', 0):.2%}",
         f"**Accuracy:** {m.get('accuracy', 0):.2%}",
         "",
         "### Recommended Settings",
         "",
         "```toml",
-        f'provider = "{meta["provider"]}"',
-        f'model = "{meta["model"]}"',
+        f'provider = "{provider}"',
+        f'model = "{model}"',
         f'temperature = {meta.get("temperature", 0.0)}',
-        "",
-        "[prompts]",
-        f'log_preprocessor = "{meta["prompt_variant"]}"',
-        f'log_anomaly_detector = "hdfs_{meta["prompt_variant"]}"',
-        f'log_explainer = "{meta["prompt_variant"]}"',
-        "```",
     ]
+    
+    if prompts:
+        lines.extend([
+            "",
+            "[prompts]",
+            f'parser = "{prompts.get("parser", "few_shot")}"',
+            f'detector = "{prompts.get("detector", "hdfs_few_shot")}"',
+            f'explainer = "{prompts.get("explainer", "few_shot")}"',
+        ])
+    
+    lines.append("```")
     
     return "\n".join(lines)
 

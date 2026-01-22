@@ -1,0 +1,28 @@
+[
+  {
+    "name": "supervisor_simple_gpt4o_mini",
+    "description": "Supervisor with SimpleWorkflow - free-form task execution",
+    "task": "anomaly_detection",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "pipeline": "supervisor",
+    "workflow": "simple",
+    "tools_available": [],
+    "tools_unavailable": ["create_tool", "create_agent"],
+    "agents_available": ["log_parser", "log_anomaly_detector", "log_explainer"],
+    "max_iterations": 10
+  },
+  {
+    "name": "supervisor_delegating_gpt4o_mini",
+    "description": "Supervisor with delegation to specialized agents",
+    "task": "anomaly_detection",
+    "provider": "openai",
+    "model": "gpt-4o-mini",
+    "pipeline": "supervisor",
+    "workflow": "simple",
+    "tools_available": [],
+    "tools_unavailable": ["create_tool"],
+    "agents_available": ["log_parser", "log_anomaly_detector", "log_explainer"],
+    "max_iterations": 15
+  }
+]

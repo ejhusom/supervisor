@@ -8,5 +8,6 @@ dependencies = [
     "levenshtein>=0.27.3",
     "litellm>=1.80.10",
     "numpy>=2.3.5",
+    "pytest>=9.0.2",
     "tomli>=2.3.0",
 ]

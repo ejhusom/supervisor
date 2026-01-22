@@ -7,8 +7,8 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from eval_structured_query import extract_json
-from eval_comparator import evaluate_answer
+from eval.eval_structured_query import extract_json
+from eval.eval_comparator import evaluate_answer
 
 
 def test_json_extraction():

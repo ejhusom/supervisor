@@ -10,12 +10,9 @@ workspace*
 logs
 results
 results_*
-evaluation
-key.txt
 .github
 AGENTS.md
-PLAN
-agent-green
-iExplain-logAnalysis
 examples
 data
+sessions
+*.csv

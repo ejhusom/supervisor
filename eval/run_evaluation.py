@@ -18,9 +18,10 @@ from core.config import config
 from core.llm_client import LLMClient
 from core.agent import Agent
 from core.prompt_registry import get_prompt
+from core.logger import get_logger
 
 
-def load_test_cases(path: str = "eval/test_cases.yaml") -> list:
+def load_test_cases(path: str = "eval/test_cases_v1.yaml") -> list:
     """Load test cases from YAML file."""
     with open(path) as f:
         data = yaml.safe_load(f)
@@ -35,7 +36,8 @@ def run_pipeline(session_logs: str, llm_client: LLMClient, prompt_variant: str):
         name="log_parser",
         system_prompt=get_prompt("log_preprocessor", prompt_variant),
         llm_client=llm_client,
-        tools={}
+        tools={},
+        logging_enabled=True
     )
     parsed = parser.run(f"Parse these logs:\n{session_logs}")
     
@@ -45,7 +47,8 @@ def run_pipeline(session_logs: str, llm_client: LLMClient, prompt_variant: str):
         name="anomaly_detector", 
         system_prompt=get_prompt("log_anomaly_detector", detector_variant),
         llm_client=llm_client,
-        tools={}
+        tools={},
+        logging_enabled=True
     )
     detection = detector.run(f"Analyze:\n{parsed['content']}")
     
@@ -54,7 +57,8 @@ def run_pipeline(session_logs: str, llm_client: LLMClient, prompt_variant: str):
         name="explainer",
         system_prompt=get_prompt("log_explainer", prompt_variant),
         llm_client=llm_client,
-        tools={}
+        tools={},
+        logging_enabled=True
     )
     explanation = explainer.run(
         f"Logs:\n{parsed['content']}\n\nDetection:\n{detection['content']}"
@@ -78,6 +82,11 @@ def run_pipeline(session_logs: str, llm_client: LLMClient, prompt_variant: str):
 
 def run_evaluation(prompt_variant: str, output_dir: str):
     """Run full evaluation and save results."""
+    
+    # Configure logger for evaluation
+    logger = get_logger()
+    logger.log_dir = Path("eval/logs")
+    logger.log_dir.mkdir(parents=True, exist_ok=True)
     
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -113,7 +122,30 @@ def run_evaluation(prompt_variant: str, output_dir: str):
     for tc in test_cases:
         print(f"\nEvaluating: {tc['id']} ({tc['description']})")
         
+        # Determine detector variant
+        detector_variant = "hdfs_few_shot" if "few_shot" in prompt_variant else "hdfs_zero_shot"
+        
+        # Start logging session for this test case
+        session_id = logger.start_session(
+            task=f"Evaluate {tc['id']}: {tc['description']}",
+            config={
+                "prompt_variant": prompt_variant,
+                "model": config.get("model"),
+                "provider": config.get("provider"),
+                "temperature": config.get("temperature"),
+                "test_id": tc["id"],
+                "blk_id": tc["blk_id"],
+                "system_prompt_parser": get_prompt("log_preprocessor", prompt_variant),
+                "system_prompt_detector": get_prompt("log_anomaly_detector", detector_variant),
+                "system_prompt_explainer": get_prompt("log_explainer", prompt_variant)
+            },
+            session_id=f"eval_{tc['id']}_{timestamp}"
+        )
+        
         result = run_pipeline(tc["logs"], llm, prompt_variant)
+        
+        # End logging session
+        logger.end_session(final_result=f"Label: {result['predicted_label']}")
         
         correct = result["predicted_label"] == tc["expected_label"]
         if result["predicted_label"] is None:

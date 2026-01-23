@@ -475,13 +475,20 @@ SYS_MSG_LOG_ANOMALY_DETECTOR_HDFS_FEW_SHOT = """
         - Clean termination of packet responders
         - No error messages or exceptions
 
-        Anomalies can manifest in various ways - obvious errors, incomplete sequences, unusual patterns, or deviations from expected HDFS behavior.
+        **Important**: Block deletion AFTER successful storage is normal HDFS behavior. Blocks are routinely deleted as part of:
+        - Temporary file cleanup (e.g., MapReduce intermediate data)
+        - User-initiated file deletions
+        - HDFS garbage collection
+        
+        A session is only anomalous if:
+        1. There are explicit errors/exceptions, OR
+        2. The block lifecycle is incomplete (e.g., allocation without storage confirmation)
 
         Instructions:
         1. Read through the entire log sequence carefully
-        2. Consider what a complete, healthy block operation should look like
-        3. Identify anything that seems wrong, incomplete, or unusual
-        4. Make your best judgment about whether this represents normal or anomalous behavior
+        2. Check if storage confirmations (addStoredBlock) are present
+        3. If storage was confirmed, subsequent deletion is NORMAL
+        4. Only flag as anomalous if there are errors OR missing storage confirmations
         5. Note the key observations that influenced your decision
 
         Output Format:
@@ -493,15 +500,17 @@ SYS_MSG_LOG_ANOMALY_DETECTOR_HDFS_FEW_SHOT = """
 
         Where:
         - label: 0 = Normal, 1 = Anomalous
-        - signals: 2-3 concise phrases describing the most important observations (what you saw that influenced your decision)
+        - signals: 2-3 concise phrases describing the most important observations
 
         Important:
         - Be concise and factual in your signals
-        - Context matters - consider the implied workflow and expected outcomes
-        - Focus on whether the operation completed successfully and as expected
+        - Deletion after storage confirmation = NORMAL
+        - Missing storage confirmation = ANOMALOUS
+        - Explicit errors/exceptions = ANOMALOUS
 
-        Here are a few examples of parsed session logs and their classifications from HDFS Distributed Storage System logs:
-        Example 1:
+        Here are examples of parsed session logs and their classifications:
+        
+        Example 1 (Normal - complete lifecycle):
             Parsed Session Logs:
                 Receiving block blk_6667093857658912327 src: /10.251.73.188:57743 dest: /10.251.73.188:50010
                 Receiving block blk_6667093857658912327 src: /10.251.73.188:54097 dest: /10.251.73.188:50010
@@ -521,11 +530,41 @@ SYS_MSG_LOG_ANOMALY_DETECTOR_HDFS_FEW_SHOT = """
                     "label": 0,
                     "signals": [
                         "successful block reception",
-                        "block storage confirmations",
+                        "block storage confirmations from 3 nodes",
                         "normal packet responder termination"
                     ]
                 }
-        Example 2:
+                
+        Example 2 (Normal - complete lifecycle WITH deletion):
+            Parsed Session Logs:
+                Receiving block blk_842810621657300290 src: /10.251.193.175:48910 dest: /10.251.193.175:50010
+                Receiving block blk_842810621657300290 src: /10.251.193.175:47516 dest: /10.251.193.175:50010
+                BLOCK* NameSystem.allocateBlock: /user/root/rand4/_temporary/_task_200811101024_0009_m_001521_0/part-01521. blk_842810621657300290
+                Receiving block blk_842810621657300290 src: /10.251.31.242:39712 dest: /10.251.31.242:50010
+                PacketResponder 1 for block blk_842810621657300290 terminating
+                Received block blk_842810621657300290 of size 67108864 from /10.251.193.175
+                PacketResponder 2 for block blk_842810621657300290 terminating
+                Received block blk_842810621657300290 of size 67108864 from /10.251.193.175
+                PacketResponder 0 for block blk_842810621657300290 terminating
+                Received block blk_842810621657300290 of size 67108864 from /10.251.31.242
+                BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.193.175:50010 is added to blk_842810621657300290 size 67108864
+                BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.250.18.114:50010 is added to blk_842810621657300290 size 67108864
+                BLOCK* NameSystem.addStoredBlock: blockMap updated: 10.251.31.242:50010 is added to blk_842810621657300290 size 67108864
+                BLOCK* NameSystem.delete: blk_842810621657300290 is added to invalidSet of 10.250.18.114:50010
+                BLOCK* NameSystem.delete: blk_842810621657300290 is added to invalidSet of 10.251.193.175:50010
+                BLOCK* NameSystem.delete: blk_842810621657300290 is added to invalidSet of 10.251.31.242:50010
+                Deleting block blk_842810621657300290 file /mnt/hadoop/dfs/data/current/subdir49/blk_842810621657300290
+            Output:
+                {
+                    "label": 0,
+                    "signals": [
+                        "block storage confirmed on 3 nodes before deletion",
+                        "deletion after successful storage is normal cleanup",
+                        "no errors or exceptions present"
+                    ]
+                }
+                
+        Example 3 (Anomalous - incomplete, no storage confirmation):
             Parsed Session Logs:
                 BLOCK* NameSystem.allocateBlock: /user/root/randtxt5/_temporary/_task_200811101024_0012_m_001014_0/part-01014. blk_4615226180823858743
                 Receiving block blk_4615226180823858743 src: /10.251.30.179:36961 dest: /10.251.30.179:50010
@@ -537,8 +576,9 @@ SYS_MSG_LOG_ANOMALY_DETECTOR_HDFS_FEW_SHOT = """
                         "missing block storage confirmation",
                         "early termination of block lifecycle"
                     ]
-                }     
-        Example 3:
+                }
+                
+        Example 4 (Anomalous - explicit error):
             Parsed Session Logs:
                 BLOCK* NameSystem.allocateBlock: /user/root/randtxt/_temporary/_task_200811092030_0003_m_000269_0/part-00269. blk_-152459496294138933
                 Receiving block blk_-152459496294138933 src: /10.251.74.134:53158 dest: /10.251.74.134:50010
@@ -570,13 +610,20 @@ SYS_MSG_LOG_ANOMALY_DETECTOR_HDFS_ZERO_SHOT = """
         - Clean termination of packet responders
         - No error messages or exceptions
 
-        Anomalies can manifest in various ways - obvious errors, incomplete sequences, unusual patterns, or deviations from expected HDFS behavior.
+        **Important**: Block deletion AFTER successful storage is normal HDFS behavior. Blocks are routinely deleted as part of:
+        - Temporary file cleanup (e.g., MapReduce intermediate data)
+        - User-initiated file deletions
+        - HDFS garbage collection
+        
+        A session is only anomalous if:
+        1. There are explicit errors/exceptions, OR
+        2. The block lifecycle is incomplete (e.g., allocation without storage confirmation)
 
         Instructions:
         1. Read through the entire log sequence carefully
-        2. Consider what a complete, healthy block operation should look like
-        3. Identify anything that seems wrong, incomplete, or unusual
-        4. Make your best judgment about whether this represents normal or anomalous behavior
+        2. Check if storage confirmations (addStoredBlock) are present
+        3. If storage was confirmed, subsequent deletion is NORMAL
+        4. Only flag as anomalous if there are errors OR missing storage confirmations
         5. Note the key observations that influenced your decision
 
         Output Format:
@@ -588,12 +635,13 @@ SYS_MSG_LOG_ANOMALY_DETECTOR_HDFS_ZERO_SHOT = """
 
         Where:
         - label: 0 = Normal, 1 = Anomalous
-        - signals: 2-3 concise phrases describing the most important observations (what you saw that influenced your decision)
+        - signals: 2-3 concise phrases describing the most important observations
 
         Important:
         - Be concise and factual in your signals
-        - Context matters - consider the implied workflow and expected outcomes
-        - Focus on whether the operation completed successfully and as expected
+        - Deletion after storage confirmation = NORMAL
+        - Missing storage confirmation = ANOMALOUS
+        - Explicit errors/exceptions = ANOMALOUS
         """
 
 # Alternative: Chain-of-thought approach, HDFS-specialized version
